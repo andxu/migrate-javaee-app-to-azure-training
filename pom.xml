@@ -253,7 +253,7 @@
       <plugin>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>azure-webapp-maven-plugin</artifactId>
-        <version>1.15.0-SNAPSHOT</version>
+        <version>1.15.0</version>
         <configuration>
           <schemaVersion>v2</schemaVersion>
           <subscriptionId>${SUBSCRIPTION}</subscriptionId>
@@ -514,14 +514,4 @@
             <url>https://repository.primefaces.org/</url>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>sonatype</id>
-            <name>sonatype</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
 </project>
