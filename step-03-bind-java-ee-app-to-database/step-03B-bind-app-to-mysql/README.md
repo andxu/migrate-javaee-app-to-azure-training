@@ -25,7 +25,7 @@ Install a JBoss EAP module:
 # where resources point to JDBC driver for MySQL
 # and module xml points to module description, see below
 
-module add --name=com.mysql --resources=/home/site/libs/mysql-connector-java-8.0.13.jar --module-xml=/home/site/wwwroot/mysql-module.xml
+module add --name=com.mysql --resources=/home/site/libs/mysql-connector-java-8.0.13.jar --module-xml=/home/site/scripts/mysql-module.xml
 ```
 Where `mysql-module.xml` describes the module:
 
@@ -99,7 +99,7 @@ Open `pom.xml` and update the `deployment` with the following configuration and 
       </includes>
     </resource>
     <resource>
-      <type>static</type>
+      <type>script</type>
       <directory>${project.basedir}/.scripts/3B-mysql</directory>
       <includes>
         <include>*.cli</include>

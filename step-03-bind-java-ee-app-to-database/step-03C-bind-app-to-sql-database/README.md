@@ -25,7 +25,7 @@ Install a JBoss EAP module:
 # where resources point to JDBC driver for SQL Database
 # and module xml points to module description, see below
 
-module add --name=com.microsoft --resources=/home/site/libs/mssql-jdbc-7.2.1.jre8.jar --module-xml=/home/site/wwwroot/mssql-module.xml
+module add --name=com.microsoft --resources=/home/site/libs/mssql-jdbc-7.2.1.jre8.jar --module-xml=/home/site/scripts/mssql-module.xml
 ```
 Where `mssql-module.xml` describes the module:
 
@@ -94,7 +94,7 @@ Open `pom.xml` and update the `deployment` with the following configuration and 
       </includes>
     </resource>
     <resource>
-      <type>static</type>
+      <type>script</type>
       <directory>${project.basedir}/.scripts/3C-sql</directory>
       <includes>
         <include>*.cli</include>

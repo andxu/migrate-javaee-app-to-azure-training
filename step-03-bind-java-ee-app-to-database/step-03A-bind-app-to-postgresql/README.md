@@ -25,7 +25,7 @@ Install a JBoss EAP module:
 # where resources point to JDBC driver for PostgreSQL
 # and module xml points to module description, see below
 
-module add --name=org.postgres --resources=/home/site/libs/postgresql-42.2.5.jar --module-xml=/home/site/wwwroot/postgresql-module.xml
+module add --name=org.postgres --resources=/home/site/libs/postgresql-42.2.5.jar --module-xml=/home/site/scripts/postgresql-module.xml
 ```
 Where `postgresql-module.xml` describes the module:
 
@@ -95,7 +95,7 @@ Open `pom.xml` and update the `deployment` with the following configuration and 
       </includes>
     </resource>
     <resource>
-      <type>static</type>
+      <type>script</type>
       <directory>${project.basedir}/.scripts/3A-postgresql</directory>
       <includes>
         <include>*.cli</include>
