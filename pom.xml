@@ -303,7 +303,7 @@
                 </includes>
               </resource>
               <resource>
-                <type>static</type>
+                <type>script</type>
                 <directory>${project.basedir}/.scripts/3B-mysql</directory>
                 <includes>
                   <include>*.cli</include>
