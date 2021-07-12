@@ -22,7 +22,7 @@ export REGION=eastus
 
 export DATABASE_SERVER=migrate-petstore-andxu
 export DATABASE_ADMIN=andxu
-export DATABASE_ADMIN_PASSWORD=secret
+export DATABASE_ADMIN_PASSWORD=SuperS3cr3t
 
 
 export MYSQL_SERVER_NAME=mysql-${DATABASE_SERVER}
@@ -69,6 +69,8 @@ az mysql server configuration set --name wait_timeout \
 ```bash
 mysql -u ${MYSQL_SERVER_ADMIN_FULL_NAME}  -h ${MYSQL_SERVER_FULL_NAME} -P 3306 -p
 ```
+
+in the password prompt, input mysql password: `SuperS3cr3t`
 
 2. Create `petstore` database,
 

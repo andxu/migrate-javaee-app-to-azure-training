@@ -254,7 +254,6 @@
         <artifactId>azure-webapp-maven-plugin</artifactId>
         <version>1.16.1</version>
         <configuration>
-          <schemaVersion>v2</schemaVersion>
           <subscriptionId>${SUBSCRIPTION}</subscriptionId>
           <resourceGroup>${RESOURCE_GROUP}</resourceGroup>
           <appName>${WEBAPP}</appName>
