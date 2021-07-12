@@ -4,110 +4,96 @@ platforms: java
 author: selvasingh, sadigopu
 ---
 
-# Migrate Java EE App to Azure
+# Quick steps to deploy JBoss sample app to azure webapp using mysql
 
-You will find here a full training workshop on migrating an existing Java EE application to Azure, 
-including guides and demos. You will migrate:
- 
-- Java EE application to App Service Linux and 
-- Application's data to Azure Database for PostgreSQL, MySQL and or SQL Database. 
+## Login
+```bash
+az login
+az account show
+```
 
-## What you should expect
+# Create mysql server
 
-This is not the official documentation but an opinionated training.
+```bash
+export SUBSCRIPTION=$(az account show --query id --output tsv)
+export RESOURCE_GROUP=migrate-javaee-app
+export WEBAPP=migrate-petstore-andxu
+export REGION=eastus
 
-It is a hands-on training, and it will use the command line extensively. 
-The idea is to get coding very quickly and play with the platform, 
-from a simple demo to far more complex examples.
+export DATABASE_SERVER=migrate-petstore-andxu
+export DATABASE_ADMIN=andxu
+export DATABASE_ADMIN_PASSWORD=secret
 
-After completing all the guides, you should have a fairly good understanding of 
-everything that Azure offers for running Java EE applications on PaaS without worrying
-about the underlying infrastructure or monitoring applications.
 
-You will migrate the famous [Sun's 2003 Java EE Blue Print](https://www.oracle.com/java/technologies/java-blueprint.html) 
-sample application. The most recent incarnation of the sample application uses:
+export MYSQL_SERVER_NAME=mysql-${DATABASE_SERVER}
+export MYSQL_SERVER_ADMIN_LOGIN_NAME=${DATABASE_ADMIN}
+export MYSQL_SERVER_ADMIN_PASSWORD=${DATABASE_ADMIN_PASSWORD}
+export MYSQL_DATABASE_NAME=petstore
 
-- Java SE 8
-- Java EE 7
-- JSR 338 Java Persistence API (JPA 2.2)
-- JSR 346 Context and Dependency Injection (CDI 1.1)
-- JSR 345 Enterprise Java Beans 3.2 (EJB 3.2)
-- JSR 344 Java Server Faces (JSF 2.2) 
-- JSR 339 Java API for RESTful Web Services (JAX-RS 2.0)
-- Twitter Bootstrap (Bootstrap 3.x, JQuery 2.x, PrimeFaces 6.x) 
+export MYSQL_SERVER_FULL_NAME=${MYSQL_SERVER_NAME}.mysql.database.azure.com
+export MYSQL_CONNECTION_URL=jdbc:mysql://${MYSQL_SERVER_FULL_NAME}:3306/${MYSQL_DATABASE_NAME}?ssl=true\&useLegacyDatetimeCode=false\&serverTimezone=GMT
+export MYSQL_SERVER_ADMIN_FULL_NAME=${MYSQL_SERVER_ADMIN_LOGIN_NAME}\@${MYSQL_SERVER_NAME}
 
-Upon migration, you will power the app using 
-Azure Database for PostgreSQL, MySQL and or SQL Database.
+export DEVBOX_IP_ADDRESS=167.220.255.76
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_291.jdk/Contents/Home
 
-## Symbols
+az mysql server create --resource-group ${RESOURCE_GROUP} \
+    --name ${MYSQL_SERVER_NAME}  --location ${REGION} \
+    --admin-user ${MYSQL_SERVER_ADMIN_LOGIN_NAME} \
+    --admin-password ${MYSQL_SERVER_ADMIN_PASSWORD} \
+    --sku-name GP_Gen5_32 \
+    --ssl-enforcement Disabled \
+    --version 5.7
 
->🛑 -  __Manual Modification Required__. When this symbol appears in front of one or 
-more commands, you will need to modify the commands as indicated prior to running them.
+az mysql server firewall-rule create --name allAzureIPs \
+    --server ${MYSQL_SERVER_NAME} \
+    --resource-group ${RESOURCE_GROUP} \
+    --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
 
->🚧 - __Preview-specific__. This symbol indicates steps that are only necessary while 
-JBoss EAP on App Service is in preview.
+az mysql server firewall-rule create --name myDevBox \
+    --server ${MYSQL_SERVER_NAME} \
+    --resource-group ${RESOURCE_GROUP} \
+    --start-ip-address ${DEVBOX_IP_ADDRESS} --end-ip-address ${DEVBOX_IP_ADDRESS}
 
->💡 - __Frustration Avoidance Tip__. These will help you avoid potential pitfalls.
+az mysql server configuration set --name wait_timeout \
+    --resource-group ${RESOURCE_GROUP} \
+    --server ${MYSQL_SERVER_NAME} --value 2147483
 
-## [00 - Prerequisites and Setup](step-00-setup-your-environment/README.md) (15 minutes)
 
-Prerequisites and environment setup.
- 
-## [01 - Deploy a Java EE application to Azure](step-01-deploy-java-ee-app-to-azure/README.md) (15 minutes)
+```
 
-Deploy a Java EE application to Azure.
 
-## [02 - Create a database](step-02-create-a-database/README.md) (10 minutes)
+## Configure mysql database
 
-Create a database - PostgreSQL or MySQL or SQL Database.
+1. Connect to mysql server:
+```bash
+mysql -u ${MYSQL_SERVER_ADMIN_FULL_NAME}  -h ${MYSQL_SERVER_FULL_NAME} -P 3306 -p
+```
 
-## [03 - Bind Java EE application to the database](step-03-bind-java-ee-app-to-database/README.md) (15 minutes)
+2. Create `petstore` database,
 
-Bind the Java EE application to the database.
+```bash
+CREATE DATABASE petstore;
+CREATE USER 'root' IDENTIFIED BY 'petstore';
+GRANT ALL PRIVILEGES ON petstore.* TO 'root';
+CALL mysql.az_load_timezone();
+SELECT name FROM mysql.time_zone_name limit 10;
+quit
+```
 
-## [04 - Monitor Java EE application](step-04-monitor-java-ee-app/README.md) (30 minutes)
+3. Change timezone
 
-Configure and monitor Java EE application and its dependencies using Azure Monitor.
+```bash
+az mysql server configuration set --name time_zone \
+    --resource-group ${RESOURCE_GROUP} \
+    --server ${MYSQL_SERVER_NAME} --value "US/Pacific"
+```
 
-## [05 - Continuously Deploy using GitHub Actions](step-05-setup-github-actions/README.md) (15 minutes)
 
-Create a GitHub Actions workflow file to continuously deploy a Java EE application.
+## Deploy the JBoss sample project
 
-## [Conclusion](step-99-conclusion/README.md) (5 minutes)
 
----
+## Change app settings
 
-## Petstore is back!
 
-This Java EE Petstore sample is forked from 
-[agoncal/agoncal-application-petstore-ee7](https://github.com/agoncal/agoncal-application-petstore-ee7) - see [Petstore README](./README-petstoreee7.md). 
-
-> When you create something and give it away, you lose control of what you've created and then, anything can happen.
-> 
-> I created this Petstore application years ago to show how Java EE components would work all together. 
-> I used this application in many talks, workshops, demos... and then, time passed, I forgot about it and never updated it.
-> I've written this code when monoliths were a thing, when the cloud was just starting, and when the only CI/CD tool we had was called Hudson.
-> 
-> Today, thanks to the Azure team, my Petstore application is built with GitHub actions and deployed to the cloud.
-> Without changing the original code, and with only a few commands and some configuration, you can deploy the application to Azure.
-> What a journey!
-> 
-> Thank you,
-> 
-> [Antonio Goncalves](http://www.antoniogoncalves.org)
-
-## Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
----
+`mvn package azure-webapp:deploy -Dmaven.test.skip=true -Ddb=mysql`

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.agoncal.application</groupId>
@@ -259,13 +258,27 @@
           <subscriptionId>${SUBSCRIPTION}</subscriptionId>
           <resourceGroup>${RESOURCE_GROUP}</resourceGroup>
           <appName>${WEBAPP}</appName>
-          <pricingTier>P1v2</pricingTier>
+          <pricingTier>P1v3</pricingTier>
           <region>${REGION}</region>
           <runtime>
             <os>Linux</os>
             <javaVersion>Java 8</javaVersion>
-            <webContainer>Jbosseap 7.2</webContainer>
+            <webContainer>Jbosseap 7</webContainer>
           </runtime>
+          <appSettings>
+            <property>
+              <name>MYSQL_CONNECTION_URL</name>
+              <value>${MYSQL_CONNECTION_URL}</value>
+            </property>
+            <property>
+              <name>MYSQL_SERVER_ADMIN_PASSWORD</name>
+              <value>${MYSQL_SERVER_ADMIN_PASSWORD}</value>
+            </property>
+            <property>
+              <name>MYSQL_SERVER_ADMIN_FULL_NAME</name>
+              <value>${MYSQL_SERVER_ADMIN_FULL_NAME}</value>
+            </property>
+          </appSettings>
           <deployment>
             <resources>
               <resource>
@@ -273,6 +286,28 @@
                 <directory>${project.basedir}/target</directory>
                 <includes>
                   <include>*.war</include>
+                </includes>
+              </resource>
+              <resource>
+                <type>lib</type>
+                <directory>${project.basedir}/.scripts/3B-mysql</directory>
+                <includes>
+                  <include>*.jar</include>
+                </includes>
+              </resource>
+              <resource>
+                <type>startup</type>
+                <directory>${project.basedir}/.scripts/3B-mysql</directory>
+                <includes>
+                  <include>*.sh</include>
+                </includes>
+              </resource>
+              <resource>
+                <type>static</type>
+                <directory>${project.basedir}/.scripts/3B-mysql</directory>
+                <includes>
+                  <include>*.cli</include>
+                  <include>*.xml</include>
                 </includes>
               </resource>
             </resources>
@@ -309,58 +344,58 @@
       </dependencies>
     </profile>
 
-  <profile>
-    <id>arquillian-wildfly-managed</id>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>${version.maven.dependency.plugin}</version>
-          <executions>
-            <execution>
-              <id>unpack</id>
-              <phase>process-test-classes</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.wildfly</groupId>
-                    <artifactId>wildfly-dist</artifactId>
-                    <version>${version.wildfly}</version>
-                    <type>zip</type>
-                    <overWrite>false</overWrite>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${version.maven.surefire.plugin}</version>
-          <configuration>
-            <skipTests>false</skipTests>
-            <systemPropertyVariables>
-              <arquillian.launch>arquillian-wildfly-managed</arquillian.launch>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
-      </plugins>
-    </build>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.arquillian</groupId>
-        <artifactId>wildfly-arquillian-container-managed</artifactId>
-        <version>${version.arquillian.wildfly}</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-  </profile>
+    <profile>
+      <id>arquillian-wildfly-managed</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>${version.maven.dependency.plugin}</version>
+            <executions>
+              <execution>
+                <id>unpack</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.wildfly</groupId>
+                      <artifactId>wildfly-dist</artifactId>
+                      <version>${version.wildfly}</version>
+                      <type>zip</type>
+                      <overWrite>false</overWrite>
+                      <outputDirectory>${project.build.directory}</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${version.maven.surefire.plugin}</version>
+            <configuration>
+              <skipTests>false</skipTests>
+              <systemPropertyVariables>
+                <arquillian.launch>arquillian-wildfly-managed</arquillian.launch>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly.arquillian</groupId>
+          <artifactId>wildfly-arquillian-container-managed</artifactId>
+          <version>${version.arquillian.wildfly}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
 
     <profile>
       <id>h2</id>
@@ -508,10 +543,10 @@
   </profiles>
 
 
- <repositories>
-        <repository>
-            <id>primefaces</id>
-            <url>https://repository.primefaces.org/</url>
-        </repository>
-    </repositories>
+  <repositories>
+    <repository>
+      <id>primefaces</id>
+      <url>https://repository.primefaces.org/</url>
+    </repository>
+  </repositories>
 </project>
