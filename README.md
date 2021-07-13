@@ -95,7 +95,6 @@ az mysql server configuration set --name time_zone \
 ## Deploy the JBoss sample project
 
 
-## Change app settings
-
-
-`mvn package azure-webapp:deploy -Dmaven.test.skip=true -Ddb=mysql`
+```bash
+mvn package azure-webapp:deploy -Dmaven.test.skip=true -Ddb=mysql
+```
