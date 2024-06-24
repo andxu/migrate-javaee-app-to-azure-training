@@ -37,7 +37,7 @@ az mysql server configuration set --name wait_timeout \
     --server ${MYSQL_SERVER_NAME} --value 2147483
 
 // log into mysql
-mysql -u ${MYSQL_SERVER_ADMIN_FULL_NAME}  -h ${MYSQL_SERVER_FULL_NAME} -P 3306 -p
+mysql -u ${MYSQL_SERVER_ADMIN_LOGIN_NAME}@${MYSQL_SERVER_NAME} -h ${MYSQL_SERVER_FULL_NAME} -P 3306 -p
 ```
 ```text
 Enter password:
